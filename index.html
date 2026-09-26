@@ -289,6 +289,14 @@ textarea:focus{ outline:2px solid var(--arcane); outline-offset:1px; }
 
 .hint{ font-size:0.8rem; color:var(--text-faint); line-height:1.5; margin-top:8px; }
 
+.pendulum-toggle{
+  display:flex; gap:10px; align-items:flex-start; cursor:pointer; margin-bottom:12px;
+  padding:10px 12px; border-radius:10px; border:1.5px dashed var(--border);
+  font-size:0.78rem; color:var(--text-dim); line-height:1.5;
+}
+.pendulum-toggle input{ margin-top:3px; width:16px; height:16px; flex-shrink:0; accent-color:var(--arcane); cursor:pointer; }
+.pendulum-toggle:has(input:checked){ border-style:solid; border-color:var(--arcane); color:var(--text); }
+
 .num-input{ max-width:84px; width:84px; text-align:right; }
 
 .advice-box{
@@ -345,7 +353,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
   <p>Yu-Gi-Oh! Master Duel "Guess the Card" event · candidate filter &amp; optimal guess suggestions</p>
 </header>
 
-<div class="disclaimer">This is a fan-made helper tool, unaffiliated with Konami / Master Duel. Card data may be inaccurate or out of sync with the game; treat suggestions as reference only and trust the in-game display.</div>
+<div class="disclaimer">This is a fan-made helper tool, unaffiliated with Konami / Master Duel. Card data may be inaccurate or out of sync with the game; treat suggestions as reference only and trust the in-game display. Also note: Master Duel excludes special collaboration cards (e.g. "Jikyuu Yakyuu Megumi Sisters"). If the candidate count doesn't line up and you spot a similar collab card, please report it via "Feedback" below; an off-by-one difference is fine to ignore and doesn't affect your judgment.</div>
 
 <div class="panel">
   <div class="panel-title"><h2><span class="n">R</span>Round Progress</h2></div>
@@ -435,6 +443,10 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
 <div class="panel">
   <div class="panel-title"><h2><span class="n">4</span>Results</h2></div>
   <div id="hintAdvice"></div>
+  <label class="pendulum-toggle" for="excludePendulumChk">
+    <input type="checkbox" id="excludePendulumChk">
+    <span>Exclude — Pendulum (when the matching-card count differs from the game's, check whether the in-game filter auto-checked "exclude Pendulum monsters" — that's a game bug, not a stable rule. If you see it ticked automatically in the game, this round's answer is definitely not a Pendulum card, so tick it here too to exclude them in sync)</span>
+  </label>
   <div class="stat-row">
     <div class="stat"><div class="num tabular" id="statCount">-</div><div class="lbl">Matching cards</div></div>
     <div class="stat"><div class="num tabular" id="statTuple">-</div><div class="lbl">Unique combos</div></div>
@@ -531,11 +543,13 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     return "Normal";
   }
 
-  // Pendulum monsters are never drawn as the answer in this event — the answer pool
-  // contains none (guessing "Effect" right with a non-Pendulum card makes the in-game
-  // filter auto-check "exclude Pendulum", which proves this). Pendulum cards can still
-  // be used as guesses (compared via the skeleton types above); they're just never
-  // candidate answers, so the whole batch is excluded from the candidate pool.
+  // Pendulum monsters are NOT necessarily excluded as answers — with only a single known
+  // clue (e.g. an attribute), Pendulum cards are still valid candidates. However, once a
+  // guess locks "Card Type" to a single skeleton category (e.g. guessing "Effect" right
+  // with a non-Pendulum card), the in-game filter auto-checks "exclude Pendulum". This
+  // looks like the filter peeking at the answer, not a stable rule derivable from known
+  // clues, so it isn't applied automatically — instead the user ticks "exclude Pendulum"
+  // by hand in the Results panel, whenever they actually see the game do it.
   function isPendulumCard(rawType){
     return rawType.indexOf("Pendulum") !== -1;
   }
@@ -545,7 +559,8 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     known: {type:null, attr:null, race:null, lv:null, atk:null, def:null},
     guesses: [], // {id,name,card:{...}, matches:{type,attr,race,lv,atk,def}}
     remainingGuesses: null,
-    remainingHints: null
+    remainingHints: null,
+    excludePendulum: false
   };
 
   // Manually updated on each release (UTC+8). Included automatically in feedback
@@ -571,6 +586,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
           state.guesses = Array.isArray(parsed.guesses) ? parsed.guesses : [];
           state.remainingGuesses = (typeof parsed.remainingGuesses === "number") ? parsed.remainingGuesses : null;
           state.remainingHints = (typeof parsed.remainingHints === "number") ? parsed.remainingHints : null;
+          state.excludePendulum = !!parsed.excludePendulum;
         }
       }
     }catch(e){}
@@ -583,8 +599,8 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
   }
 
   function sortLvValues(arr){
+    // The "LINK-" prefix is stripped at load time, so plain numeric sorting works.
     var attrOrder = function(v){
-      if(v.indexOf("LINK") === 0){ return 1000 + parseInt(v.replace("LINK-",""),10); }
       var n = parseInt(v,10);
       return isNaN(n) ? 2000 : n;
     };
@@ -716,10 +732,18 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     return {known:known, excluded:excluded};
   }
 
+  // Cards that exist in the database but were found not to be in this event's answer pool
+  // (e.g. special collaboration cards with licensing restrictions). Kept up to date from
+  // user reports. These cards can still be used as guesses; they're just never answers.
+  var EXCLUDED_ANSWER_IDS = {
+    49858495: true // Jikyuu Yakyuu Megumi Sisters (special collaboration card)
+  };
+
   function computeCandidates(){
     var ec = effectiveConstraints();
     return CARDS.filter(function(c){
-      if(c.isPendulum) return false; // Pendulum monsters are never the answer in this event
+      if(state.excludePendulum && c.isPendulum) return false; // only excluded when the user ticks the box
+      if(EXCLUDED_ANSWER_IDS[c.id]) return false;
       for(var i=0;i<FIELDS.length;i++){
         var f = FIELDS[i];
         if(ec.known[f] !== undefined && c[f] !== ec.known[f]) return false;
@@ -851,7 +875,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     var deducedCount = FIELDS.filter(function(f){ return pendingDeduced[f] !== undefined; }).length;
     var html = '<div class="picked-card"><div class="name">' + c.name + '</div>';
     if(deducedCount > 0){
-      html += '<div class="hint" style="margin-top:0;margin-bottom:8px;">'+deducedCount+' fields already deduced from known clues (marked AUTO); mark the other '+(6-deducedCount)+' as Right/Wrong per the in-game display.</div>';
+      html += '<div class="hint" style="margin-top:0;margin-bottom:8px;">'+deducedCount+' fields already deduced from known clues (marked AUTO); mark the other '+(6-deducedCount)+' Right/Wrong by checking the in-game "Record" log.</div>';
     }
     html += '<div class="field-toggle-grid">';
     FIELDS.forEach(function(f){
@@ -1178,6 +1202,8 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     renderResult();
     renderCandidateList(document.getElementById("candSearchBox").value);
     renderRoundLabel();
+    var pendChk = document.getElementById("excludePendulumChk");
+    if(pendChk) pendChk.checked = !!state.excludePendulum;
   }
 
   function recompute(){
@@ -1264,6 +1290,11 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
       renderCandidateList(this.value);
     });
     document.getElementById("sendFeedbackBtn").addEventListener("click", sendFeedback);
+    document.getElementById("excludePendulumChk").addEventListener("change", function(){
+      state.excludePendulum = this.checked;
+      saveState();
+      recompute();
+    });
     setupSearch();
   }
 
@@ -1275,6 +1306,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     var ec = effectiveConstraints();
     var lines = [];
     lines.push("Tool version: " + TOOL_VERSION);
+    lines.push("Manually excluded Pendulum: " + (state.excludePendulum ? "yes" : "no"));
     lines.push("Round: question " + state.round);
     var knownParts = FIELDS.map(function(f){
       return ec.known[f] !== undefined ? (FIELD_NAMES[f] + "=" + ec.known[f]) : null;
@@ -1324,7 +1356,17 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     var vt = document.getElementById("versionTag");
     if(vt) vt.textContent = "· version " + TOOL_VERSION;
     fetch("cards.json").then(function(r){ return r.json(); }).then(function(data){
-      data.forEach(function(c){ c.isPendulum = isPendulumCard(c.type); c.type = normalizeGameType(c.type); });
+      data.forEach(function(c){
+        c.isPendulum = isPendulumCard(c.type);
+        c.type = normalizeGameType(c.type);
+        // A Link monster's Link Rating is stored as a "LINK-4" string, but the game's
+        // guess comparison treats Level/Rank/Link Rating as one numeric field (Lv4 = Rank 4
+        // = Link 4 all compare as the same "4"), so strip the prefix here and compare the
+        // plain numeric strings downstream.
+        if(typeof c.lv === "string" && c.lv.indexOf("LINK-") === 0){
+          c.lv = c.lv.slice(5);
+        }
+      });
       CARDS = data;
       CARDS.forEach(function(c){ byId[c.id] = c; });
       buildOptions();
