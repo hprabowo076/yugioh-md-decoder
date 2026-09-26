@@ -1283,6 +1283,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
       state.round = Math.min(9, state.round+1);
       state.known = {type:null,attr:null,race:null,lv:null,atk:null,def:null};
       state.guesses = [];
+      state.excludePendulum = false;
       saveState();
       renderAll();
     });
