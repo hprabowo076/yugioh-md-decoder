@@ -1,24 +1,31 @@
-# 決鬥解碼盤
+# Duel Decoder
 
-遊戲王 Master Duel「猜卡」活動的候選卡篩選與最佳猜測建議工具。內建完整 9060 張怪獸卡資料，本機瀏覽器儲存進度，不需要帳號、不會上傳任何資料。
+A candidate-filter and optimal-guess suggestion tool for the Yu-Gi-Oh! Master Duel "Guess the Card" event. Ships with data for all 9,060 monster cards; progress is stored in your local browser only — no account, nothing uploaded.
 
-## 功能
+English fork of [shangwen46-beep/yugioh-md-decoder](https://github.com/shangwen46-beep/yugioh-md-decoder).
 
-- 記錄已知線索（開局揭露 + 每日提示）與每次猜測的對/錯回饋
-- 自動篩選出所有符合條件的候選卡
-- 用資訊熵演算法計算「下一猜」的最佳探測卡（類似 Wordle 的猜測策略）
-- 提示（Hint）使用時機建議
-- 剩餘猜測/提示次數記錄
-- 亮/暗主題切換
+## Features
 
-## 使用方式
+- Record known clues (starting reveal + daily hints) and Right/Wrong feedback for each guess
+- Automatically filters all candidate cards that match your constraints
+- Information-entropy algorithm computes the best probe card for your next guess (Wordle-style strategy)
+- Hints on when to spend a Hint
+- Tracks remaining guess/hint counts
+- Light/dark theme toggle
 
-直接打開 GitHub Pages 連結即可使用（見下方「Demo」，若尚未啟用請至 repo 的 Settings → Pages 開啟）。也可以直接下載 `index.html` 和 `cards.json`（放在同一資料夾）用瀏覽器打開。
+## Usage
 
-## 免責聲明
+Open the GitHub Pages link (see "Demo" below; if not enabled, turn it on under repo Settings → Pages). You can also download `index.html` and `cards.json` into the same folder and open `index.html` in a browser.
 
-本工具為玩家自製的輔助計算小工具，與 Konami / Master Duel 官方無關；卡片資料可能有誤或與遊戲版本不同步，建議結果僅供參考，請仍以遊戲內實際顯示為準。
+## Translation notes
 
-## 授權
+- Card names were matched to official English names via MasterDuelMeta (by Konami passcode). Attribute/Race/Card Type values in `cards.json` are stored in English to match the UI.
+- Card data fixes: `Black Luster Soldier` had id `5405695` upstream; corrected to the official passcode `5405694`.
 
-歡迎自由使用、修改、分享。
+## Disclaimer
+
+This tool is a fan-made helper and is not affiliated with Konami / Master Duel. Card data may contain errors or be out of sync with the game version; treat suggestions as reference only and always trust the in-game display.
+
+## License
+
+Feel free to use, modify, and share.

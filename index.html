@@ -1,4 +1,4 @@
-<title>決鬥解碼盤</title>
+<title>Duel Decoder</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
 <style>
 :root{
@@ -334,23 +334,23 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
 
 <header>
   <div class="font-control" id="fontControl">
-    <button type="button" id="fontMinus" aria-label="縮小字體">A−</button>
-    <button type="button" id="fontPlus" aria-label="放大字體">A+</button>
+    <button type="button" id="fontMinus" aria-label="Decrease font size">A−</button>
+    <button type="button" id="fontPlus" aria-label="Increase font size">A+</button>
   </div>
-  <button class="theme-toggle" id="themeToggle" type="button" aria-label="切換亮/暗主題">
+  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle light/dark theme">
     <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"></path></svg>
     <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
   </button>
-  <h1>決鬥解碼盤</h1>
-  <p>遊戲王 Master Duel 猜卡活動 · 候選篩選與最佳猜測建議</p>
+  <h1>Duel Decoder</h1>
+  <p>Yu-Gi-Oh! Master Duel "Guess the Card" event · candidate filter &amp; optimal guess suggestions</p>
 </header>
 
-<div class="disclaimer">本工具為玩家自製的輔助計算小工具，與 Konami / Master Duel 官方無關；卡片資料可能有誤或與遊戲版本不同步，建議結果僅供參考，請仍以遊戲內實際顯示為準。</div>
+<div class="disclaimer">This is a fan-made helper tool, unaffiliated with Konami / Master Duel. Card data may be inaccurate or out of sync with the game; treat suggestions as reference only and trust the in-game display.</div>
 
 <div class="panel">
-  <div class="panel-title"><h2><span class="n">R</span>回合進度</h2></div>
+  <div class="panel-title"><h2><span class="n">R</span>Round Progress</h2></div>
   <div class="row">
-    <label>目前第幾題</label>
+    <label>Current question</label>
     <div class="btnrow">
       <button class="ghost" id="roundMinus">−</button>
       <span class="tabular" style="min-width:56px;text-align:center;font-weight:600;" id="roundLabel">1 / 9</span>
@@ -358,106 +358,106 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     </div>
   </div>
   <div class="btnrow" style="margin-top:10px;">
-    <button class="ghost" id="newRoundBtn">開始新的一回合（清空線索與猜測）</button>
+    <button class="ghost" id="newRoundBtn">Start a new round (clear clues &amp; guesses)</button>
   </div>
-  <div class="hint">活動截止 10/12 23:59。答對可保留剩餘猜測/提示次數到下一輪，次數請自行依遊戲內顯示管理。</div>
+  <div class="hint">Event ends 10/12 23:59 (UTC+8). Correct answers carry remaining guess/hint counts into the next round — manage the counts to match the in-game display.</div>
 </div>
 
 <div class="panel">
-  <div class="panel-title"><h2><span class="n">$</span>剩餘次數</h2></div>
+  <div class="panel-title"><h2><span class="n">$</span>Remaining Counts</h2></div>
   <div class="row">
-    <label>剩餘猜測次數</label>
+    <label>Remaining guesses</label>
     <input type="number" id="remainingGuessesInput" class="num-input" min="0" placeholder="—">
   </div>
   <div class="row">
-    <label>剩餘提示次數</label>
+    <label>Remaining hints</label>
     <input type="number" id="remainingHintsInput" class="num-input" min="0" placeholder="—">
   </div>
 
   <div class="btnrow" style="margin-top:10px;" id="openUseHintArea">
-    <button class="gold" id="openUseHint" style="width:100%;">✦ 使用一次提示</button>
+    <button class="gold" id="openUseHint" style="width:100%;">✦ Use a hint</button>
   </div>
 
   <div id="useHintForm" hidden style="margin-top:10px;">
     <div class="row">
-      <label>提示揭露的欄位</label>
+      <label>Field revealed by the hint</label>
       <select id="hintFieldSelect"></select>
     </div>
     <div class="row">
-      <label>對應數值</label>
+      <label>Its value</label>
       <select id="hintValueSelect"></select>
     </div>
     <div class="btnrow" style="margin-top:8px;">
-      <button class="gold" id="confirmHintBtn">確認套用</button>
-      <button class="ghost" id="cancelHintBtn">取消</button>
+      <button class="gold" id="confirmHintBtn">Apply</button>
+      <button class="ghost" id="cancelHintBtn">Cancel</button>
     </div>
   </div>
-  <div class="hint">新增一次猜測紀錄時，剩餘猜測次數會自動 −1；按「使用一次提示」並套用後，剩餘提示次數會自動 −1。這兩個數字只是輔助記錄，不會影響下方候選篩選的邏輯，你可以隨時手動修正。</div>
+  <div class="hint">Adding a guess record automatically subtracts 1 from remaining guesses; applying "Use a hint" subtracts 1 from remaining hints. These numbers are bookkeeping only and don't affect the candidate filter — feel free to correct them anytime.</div>
 </div>
 
 <div class="panel">
-  <div class="panel-title"><h2><span class="n">1</span>已知線索</h2></div>
+  <div class="panel-title"><h2><span class="n">1</span>Known Clues</h2></div>
   <div id="knownRows"></div>
-  <div class="hint">開局會直接給 1 項資訊；使用提示會隨機補 1 項未知資訊。取得後在這裡設定對應數值即可。若某項已經靠「猜測紀錄」確定下來，這裡會自動顯示並鎖住（灰色、標示「由猜測確定」），不用重複輸入。</div>
+  <div class="hint">The game reveals 1 clue at the start; each hint adds 1 random unknown clue. Set the value here once obtained. If a field is already determined by your guess history, it's shown locked (grey, marked "from guesses") — no need to re-enter it.</div>
 </div>
 
 <div class="panel">
-  <div class="panel-title"><h2><span class="n">2</span>猜測紀錄</h2></div>
+  <div class="panel-title"><h2><span class="n">2</span>Guess History</h2></div>
   <div id="guessList"></div>
-  <div id="guessListEmpty" class="hint">尚未新增任何猜測。</div>
+  <div id="guessListEmpty" class="hint">No guesses recorded yet.</div>
 
   <div style="margin-top:12px;" id="addGuessArea">
-    <button class="primary" id="openAddGuess" style="width:100%;">＋ 新增一次猜測</button>
+    <button class="primary" id="openAddGuess" style="width:100%;">＋ Add a guess</button>
   </div>
 
   <div id="addGuessForm" hidden style="margin-top:10px;">
     <div class="search-row">
       <div class="search-wrap">
-        <input type="text" id="cardSearch" placeholder="搜尋卡名（輸入中文名關鍵字）..." autocomplete="off">
+        <input type="text" id="cardSearch" placeholder="Search card name..." autocomplete="off">
         <div class="dropdown" id="searchDropdown" hidden></div>
       </div>
-      <a class="query-link" href="https://salix5.github.io/query/" target="_blank" rel="noopener">查牌網 ↗</a>
+      <a class="query-link" href="https://www.masterduelmeta.com/cards" target="_blank" rel="noopener">Card DB ↗</a>
     </div>
-    <div class="hint" style="margin-top:6px;">遊戲內卡名可能跟資料庫翻譯不同，可用查牌網以圖片/其他條件查詢，並以查牌網名稱為準。</div>
+    <div class="hint" style="margin-top:6px;">If you can't find a card by name, look it up on the Card DB by artwork or other criteria.</div>
     <div id="pickedCardBox"></div>
     <div class="btnrow" style="margin-top:10px;">
-      <button class="gold" id="confirmGuessBtn" disabled>確認加入猜測結果</button>
-      <button class="ghost" id="cancelGuessBtn">取消</button>
+      <button class="gold" id="confirmGuessBtn" disabled>Add guess result</button>
+      <button class="ghost" id="cancelGuessBtn">Cancel</button>
     </div>
   </div>
 </div>
 
 <div class="panel">
-  <div class="panel-title"><h2><span class="n">3</span>已知資訊摘要</h2></div>
+  <div class="panel-title"><h2><span class="n">3</span>Known Info Summary</h2></div>
   <div class="chips" id="knownChips"></div>
 </div>
 
 <div class="panel">
-  <div class="panel-title"><h2><span class="n">4</span>候選結果</h2></div>
+  <div class="panel-title"><h2><span class="n">4</span>Results</h2></div>
   <div id="hintAdvice"></div>
   <div class="stat-row">
-    <div class="stat"><div class="num tabular" id="statCount">-</div><div class="lbl">符合卡片數</div></div>
-    <div class="stat"><div class="num tabular" id="statTuple">-</div><div class="lbl">唯一組合數</div></div>
+    <div class="stat"><div class="num tabular" id="statCount">-</div><div class="lbl">Matching cards</div></div>
+    <div class="stat"><div class="num tabular" id="statTuple">-</div><div class="lbl">Unique combos</div></div>
   </div>
 
   <div id="resultBody"></div>
 </div>
 
 <div class="panel">
-  <div class="panel-title"><h2><span class="n">5</span>候選卡清單</h2></div>
-  <input type="text" class="cand-search" id="candSearchBox" placeholder="在候選卡中搜尋名稱...">
+  <div class="panel-title"><h2><span class="n">5</span>Candidate Cards</h2></div>
+  <input type="text" class="cand-search" id="candSearchBox" placeholder="Search candidate names...">
   <div class="cand-list" id="candList"></div>
 </div>
 
 <div class="panel">
-  <div class="panel-title"><h2><span class="n">✎</span>問題回饋</h2></div>
-  <div class="hint" style="margin-bottom:8px;">遇到卡池資料錯誤、算出來的數字不對，或任何操作上的問題，都可以在這裡描述一下。送出時會自動一起附上目前的已知線索、猜測紀錄、候選數等工具狀態，方便我對照重現問題——不會附上任何個人資訊。按下送出後會開一個新分頁到 Google 表單，你只要按「提交」就完成了，不需要登入或註冊。</div>
-  <textarea id="feedbackText" placeholder="描述你遇到的問題，例如：候選卡數跟遊戲內顯示的不一樣、某張卡的資料好像有誤……"></textarea>
-  <button class="primary" id="sendFeedbackBtn" style="width:100%; margin-top:10px;">送出問題回饋 ↗</button>
+  <div class="panel-title"><h2><span class="n">✎</span>Feedback</h2></div>
+  <div class="hint" style="margin-bottom:8px;">Found a data error, wrong numbers, or any other problem? Describe it here. When you send, your current clues, guess history and candidate counts are attached automatically so the issue can be reproduced — no personal info is included. Sending opens a new GitHub issue in a new tab.</div>
+  <textarea id="feedbackText" placeholder="Describe the problem, e.g. the candidate count doesn't match the game, some card's data looks wrong..."></textarea>
+  <button class="primary" id="sendFeedbackBtn" style="width:100%; margin-top:10px;">Send feedback ↗</button>
   <div class="hint" id="feedbackMsg" style="margin-top:8px;"></div>
 </div>
 
-<footer>資料來源：Master Duel 怪獸卡池（共 9060 張），僅本機瀏覽器儲存進度，不會上傳。<span id="versionTag" style="margin-left:8px;"></span></footer>
+<footer>Data: Master Duel monster pool (9,060 cards). Progress is stored in your local browser only — nothing is uploaded.<span id="versionTag" style="margin-left:8px;"></span></footer>
 
 <script>
 (function(){
@@ -516,26 +516,28 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
   }
 
   var FIELDS = ["type","attr","race","lv","atk","def"];
-  var FIELD_NAMES = {type:"類型", attr:"屬性", race:"種族", lv:"星級/階級/連結數", atk:"攻擊力", def:"守備力"};
+  var FIELD_NAMES = {type:"Card Type", attr:"Attribute", race:"Type", lv:"Level/Rank/Link", atk:"ATK", def:"DEF"};
 
-  // 「類型」欄位（用於跟猜測卡比對 對/錯）只會落在 7 種骨架分類之一：融合/儀式/同步/超量/連結/效果/通常。
-  // 一張卡若同時具備特殊召喚類型（融合/儀式/同步/超量/連結）與 效果，遊戲只會顯示特殊召喚類型，
-  // 例如「融合/效果」在遊戲裡就是「融合」，不是「效果」；同理「儀式/效果」是「儀式」。
-  var TYPE_PRIORITY = ["融合", "儀式", "同步", "超量", "連結"];
+  // The "Card Type" field (compared Right/Wrong against guesses) is one of 7 skeleton
+  // categories: Fusion/Ritual/Synchro/Xyz/Link/Effect/Normal. If a card has both a special-
+  // summon type and Effect, the game only shows the special-summon type: "Fusion/Effect"
+  // displays as "Fusion", not "Effect".
+  var TYPE_PRIORITY = ["Fusion", "Ritual", "Synchro", "Xyz", "Link"];
   function normalizeGameType(t){
     for(var i=0;i<TYPE_PRIORITY.length;i++){
       if(t.indexOf(TYPE_PRIORITY[i]) !== -1) return TYPE_PRIORITY[i];
     }
-    if(t.indexOf("效果") !== -1) return "效果";
-    return "通常";
+    if(t.indexOf("Effect") !== -1) return "Effect";
+    return "Normal";
   }
 
-  // 靈擺(鐘擺)怪獸實測「不會被抽成謎底」——這個猜卡活動的答案卡池本身就不包含任何靈擺怪獸
-  // （用非靈擺卡猜中「效果」後，遊戲內建的篩選功能會自動幫你勾上「排除靈擺」，等於直接證實這件事）。
-  // 靈擺卡仍然可以拿來當「猜測」使用（比對時一樣用上面 normalizeGameType 的骨架分類比對），
-  // 只是永遠不會是候選答案，所以候選池要整批排除，而不是把它們的類型折算進某個骨架分類。
+  // Pendulum monsters are never drawn as the answer in this event — the answer pool
+  // contains none (guessing "Effect" right with a non-Pendulum card makes the in-game
+  // filter auto-check "exclude Pendulum", which proves this). Pendulum cards can still
+  // be used as guesses (compared via the skeleton types above); they're just never
+  // candidate answers, so the whole batch is excluded from the candidate pool.
   function isPendulumCard(rawType){
-    return rawType.indexOf("靈擺") !== -1;
+    return rawType.indexOf("Pendulum") !== -1;
   }
 
   var state = {
@@ -546,9 +548,9 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     remainingHints: null
   };
 
-  // 每次發布時手動更新這個時間戳（台灣時間），問題回饋會自動帶上這個版本，
-  // 方便回報時判斷對方是不是還沒更新到已修好的版本。
-  var TOOL_VERSION = "2026-09-26 10:33";
+  // Manually updated on each release (UTC+8). Included automatically in feedback
+  // so reporters can be checked against already-fixed versions.
+  var TOOL_VERSION = "2026-10-05 en-fork";
 
   var CARDS = [];
   var byId = {};
@@ -575,9 +577,9 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
   }
 
   function lvLabel(type){
-    if(type.indexOf("連結") !== -1) return "連結數";
-    if(type.indexOf("超量") !== -1) return "階級";
-    return "星級";
+    if(type.indexOf("Link") !== -1) return "Link Rating";
+    if(type.indexOf("Xyz") !== -1) return "Rank";
+    return "Level";
   }
 
   function sortLvValues(arr){
@@ -609,7 +611,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
       FIELDS.forEach(function(f){ sets[f][c[f]] = (sets[f][c[f]]||0)+1; });
     });
     uniqueOptions.type = sortByFreqDesc(Object.keys(sets.type), sets.type);
-    uniqueOptions.attr = ["光","闇","水","炎","地","風","神"].filter(function(v){return sets.attr[v];});
+    uniqueOptions.attr = ["Light","Dark","Water","Fire","Earth","Wind","Divine"].filter(function(v){return sets.attr[v];});
     uniqueOptions.race = sortByFreqDesc(Object.keys(sets.race), sets.race);
     uniqueOptions.lv = sortLvValues(Object.keys(sets.lv));
     uniqueOptions.atk = sortNumericLike(Object.keys(sets.atk));
@@ -626,10 +628,10 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
       row.className = "row";
       var label = document.createElement("label");
       var deducedOnly = !state.known[f] && ec.known[f] !== undefined;
-      label.innerHTML = FIELD_NAMES[f] + (deducedOnly ? ' <span style="color:var(--arcane);font-size:0.78rem;">(由猜測確定)</span>' : '');
+      label.innerHTML = FIELD_NAMES[f] + (deducedOnly ? ' <span style="color:var(--arcane);font-size:0.78rem;">(from guesses)</span>' : '');
       var sel = document.createElement("select");
       var optUnknown = document.createElement("option");
-      optUnknown.value = ""; optUnknown.textContent = "未知";
+      optUnknown.value = ""; optUnknown.textContent = "Unknown";
       sel.appendChild(optUnknown);
       uniqueOptions[f].forEach(function(v){
         var o = document.createElement("option");
@@ -642,7 +644,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
       if(deducedOnly){
         sel.value = ec.known[f];
         sel.disabled = true;
-        sel.title = "此欄位已由猜測紀錄確定，如需更改請修改對應的猜測結果";
+        sel.title = "This field is already determined by your guess history; edit the corresponding guess to change it";
       }
       sel.addEventListener("change", function(){
         state.known[f] = sel.value || null;
@@ -671,7 +673,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     var unresolved = FIELDS.filter(function(f){ return ec.known[f] === undefined; });
     if(unresolved.length === 0){
       var o = document.createElement("option");
-      o.value = ""; o.textContent = "（已無未知欄位）";
+      o.value = ""; o.textContent = "(no unknown fields left)";
       sel.appendChild(o);
       document.getElementById("hintValueSelect").innerHTML = "";
       document.getElementById("confirmHintBtn").disabled = true;
@@ -717,7 +719,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
   function computeCandidates(){
     var ec = effectiveConstraints();
     return CARDS.filter(function(c){
-      if(c.isPendulum) return false; // 靈擺怪獸不會是這個活動的謎底，永遠先排除
+      if(c.isPendulum) return false; // Pendulum monsters are never the answer in this event
       for(var i=0;i<FIELDS.length;i++){
         var f = FIELDS[i];
         if(ec.known[f] !== undefined && c[f] !== ec.known[f]) return false;
@@ -757,7 +759,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     if(!any){
       var chip = document.createElement("span");
       chip.className = "chip empty";
-      chip.textContent = "尚無已知確定數值";
+      chip.textContent = "No confirmed values yet";
       wrap.appendChild(chip);
     }
   }
@@ -780,7 +782,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
       FIELDS.forEach(function(f){
         var d = document.createElement("div");
         d.className = "dot " + (g.matches[f] ? "good" : "bad");
-        d.title = FIELD_NAMES[f] + (g.matches[f] ? " 對" : " 錯");
+        d.title = FIELD_NAMES[f] + (g.matches[f] ? " Right" : " Wrong");
         dots.appendChild(d);
       });
       var rm = document.createElement("button");
@@ -801,7 +803,8 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
   var pendingMatches = {};
   var pendingDeduced = {};
 
-  // 依目前已知線索(含已猜過卡的排除值)，能不能不用問遊戲就先推算出這張卡在某欄位一定對/一定錯
+  // From current known clues (including values excluded by previous guesses), deduce
+  // which fields of this card are already guaranteed Right or Wrong without asking the game
   function autoDeduceMatches(card){
     var ec = effectiveConstraints();
     var result = {};
@@ -848,15 +851,15 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     var deducedCount = FIELDS.filter(function(f){ return pendingDeduced[f] !== undefined; }).length;
     var html = '<div class="picked-card"><div class="name">' + c.name + '</div>';
     if(deducedCount > 0){
-      html += '<div class="hint" style="margin-top:0;margin-bottom:8px;">已自動依已知線索判斷 '+deducedCount+' 項（標示「推算」），其餘 '+(6-deducedCount)+' 項請照遊戲實際顯示點選對/錯。</div>';
+      html += '<div class="hint" style="margin-top:0;margin-bottom:8px;">'+deducedCount+' fields already deduced from known clues (marked AUTO); mark the other '+(6-deducedCount)+' as Right/Wrong per the in-game display.</div>';
     }
     html += '<div class="field-toggle-grid">';
     FIELDS.forEach(function(f){
       var label = f === "lv" ? lvLabel(c.type) : FIELD_NAMES[f];
       var isDeduced = pendingDeduced[f] !== undefined;
-      html += '<div class="field-toggle'+(isDeduced?' deduced':'')+'"><div><div class="fname">'+label+(isDeduced?' <span class="deduced-tag">推算</span>':'')+'</div><div class="fval">'+c[f]+'</div></div><div class="tg" data-field="'+f+'">' +
-        '<button type="button" data-val="1" class="'+(pendingMatches[f]===true?"on-good":"")+'">對</button>' +
-        '<button type="button" data-val="0" class="'+(pendingMatches[f]===false?"on-bad":"")+'">錯</button>' +
+      html += '<div class="field-toggle'+(isDeduced?' deduced':'')+'"><div><div class="fname">'+label+(isDeduced?' <span class="deduced-tag">AUTO</span>':'')+'</div><div class="fval">'+c[f]+'</div></div><div class="tg" data-field="'+f+'">' +
+        '<button type="button" data-val="1" class="'+(pendingMatches[f]===true?"on-good":"")+'">Right</button>' +
+        '<button type="button" data-val="0" class="'+(pendingMatches[f]===false?"on-bad":"")+'">Wrong</button>' +
         '</div></div>';
     });
     html += '</div>';
@@ -888,12 +891,12 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
       dd.innerHTML = "";
       if(matches.length === 0){
         var e = document.createElement("div");
-        e.className = "empty"; e.textContent = "查無符合卡名";
+        e.className = "empty"; e.textContent = "No matching cards";
         dd.appendChild(e);
       } else {
         matches.forEach(function(c){
           var row = document.createElement("div");
-          row.textContent = c.name + "（" + c.type + " / " + c.attr + "）";
+          row.textContent = c.name + " (" + c.type + " / " + c.attr + ")";
           row.addEventListener("click", function(){
             selectCardForGuess(c);
           });
@@ -956,8 +959,8 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
   }
 
   function filterMetaLine(t){
-    return "類型 " + t.type + "　·　屬性 " + t.attr + "　·　" + lvLabel(t.type) + " " + t.lv +
-      "　·　種族 " + t.race + "　·　攻擊力 " + t.atk + "　·　守備力 " + t.def;
+    return "Type " + t.type + " · Attribute " + t.attr + " · " + lvLabel(t.type) + " " + t.lv +
+      " · Race " + t.race + " · ATK " + t.atk + " · DEF " + t.def;
   }
 
   function findNamesForTuple(tuple, limit){
@@ -976,22 +979,23 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     return (EVENT_END_MS - Date.now()) / 86400000;
   }
 
-  // 3 段強度量表，數字越大越應該用掉提示；「已解出」不算在量表內
+  // 3-level recommendation scale; higher = use a hint now. "Solved" is outside the scale.
   var HINT_LEVEL_META = {
-    low:    {tag:"可以先猜，提示留著", strength:"低", rank:1},
-    medium: {tag:"適合使用提示",       strength:"中", rank:2},
-    strong: {tag:"強烈建議：現在用提示", strength:"高", rank:3}
+    low:    {tag:"OK to guess; save the hint",          strength:"Low",    rank:1},
+    medium: {tag:"Good time to use a hint",             strength:"Medium", rank:2},
+    strong: {tag:"Strongly recommended: use a hint now", strength:"High",   rank:3}
   };
 
   function computeHintAdvice(ec, candidates, tuples){
     if(tuples.length <= 1){
-      return {level:"done", tag:"已解出", text:"已經鎖定答案組合了，不需要再用提示。"};
+      return {level:"done", tag:"Solved", text:"The answer is already locked in — no hint needed."};
     }
     var unresolved = FIELDS.filter(function(f){ return ec.known[f] === undefined; });
     var level, text;
     if(unresolved.length === 1){
-      // 只剩1項未知時，提示100%能揭露答案，但「值不值得」要看盲猜省下的次數夠不夠多，
-      // 不是只要剩1項未知就一定該馬上用掉提示（候選只剩2、3種時，猜測本來就很便宜）。
+      // With 1 unknown left a hint reveals the answer 100%, but whether it's worth it
+      // depends on how many guesses blind guessing would actually save (cheap when only
+      // 2-3 candidate values remain).
       var field = unresolved[0];
       var valSet = {};
       candidates.forEach(function(c){ valSet[c[field]] = true; });
@@ -1000,34 +1004,35 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
       var worst = m - 1;
       if(m <= 2){
         level = "low";
-        text = "只剩「" + FIELD_NAMES[field] + "」這1項未知，但候選只有 " + m + " 種不同數值，直接猜其中一張，最差也只要再多猜 " + worst + " 次就能鎖定答案，不需要為了省這一點猜測次數動用提示，可以留到候選數更多的題目再用。";
+        text = "Only \"" + FIELD_NAMES[field] + "\" is unknown, and among candidates there are just " + m + " distinct values. Guessing one now locks the answer in at most " + worst + " more tries — not worth spending a hint to avoid; save it for a round with more candidates.";
       } else if(m <= 5){
         level = "medium";
-        text = "只剩「" + FIELD_NAMES[field] + "」這1項未知，候選中有 " + m + " 種不同數值。提示 100% 會直接揭露答案；靠盲猜平均要多花約 " + saved + " 次、最差要多花 " + worst + " 次猜測，如果猜測次數還算充裕可以先猜，庫存提示多的話現在用也划算。";
+        text = "Only \"" + FIELD_NAMES[field] + "\" is unknown, with " + m + " distinct values among candidates. A hint is 100% guaranteed to reveal the answer; guessing blindly costs about " + saved + " extra guesses on average (worst case " + worst + "). If guesses are plentiful, guess first; if you have hints to spare, using one now is fine.";
       } else {
         level = "strong";
-        text = "只剩「" + FIELD_NAMES[field] + "」這1項未知，候選中有 " + m + " 種不同數值，靠盲猜最差要多花 " + worst + " 次猜測。這時提示 100% 會揭露這一項，直接鎖定答案，非常划算。";
+        text = "Only \"" + FIELD_NAMES[field] + "\" is unknown, with " + m + " distinct values among candidates — blind guessing costs up to " + worst + " extra tries. A hint now is 100% guaranteed to reveal it and lock the answer. Great value.";
       }
     } else if(tuples.length > 30){
       level = "medium";
-      text = "候選組合還有 " + tuples.length + " 組，範圍仍大。如果手上有庫存提示，這是使用的好時機，能有效加速收斂，但還不到「非用不可」的程度。";
+      text = "There are still " + tuples.length + " candidate combos — the field is wide. If you have hints in stock, now is a good time: one hint speeds up convergence a lot, though it's not strictly necessary yet.";
     } else {
       level = "low";
-      text = "候選組合已經縮小到 " + tuples.length + " 組，靠猜測應該就能解決，提示可以留給之後更難的題目。";
+      text = "Down to " + tuples.length + " candidate combos — guessing should finish this. Save hints for harder rounds later.";
     }
 
-    // 活動快結束時，囤積策略的前提（省下的提示能留到下一輪用）不再成立，該提早花掉
+    // Near the event end the hoarding rationale (saved hints carry to the next round) no
+    // longer holds — spend them earlier
     var daysLeft = daysUntilEventEnd();
     if(daysLeft <= 3){
       var hasHints = state.remainingHints === null || state.remainingHints > 0;
       if(hasHints){
-        var urgency = daysLeft <= 0 ? "活動已經結束或今天就要結束" : (daysLeft <= 1 ? "活動明天就結束" : "活動只剩不到 " + Math.ceil(daysLeft) + " 天");
-        text += " ⏰ " + urgency + "了，囤積提示換取「以後更需要時再用」的前提已經不成立——用不完的提示不會有下一輪可以留，建議這幾天積極花掉庫存，不用再像前面那樣保守。";
+        var urgency = daysLeft <= 0 ? "The event is over or ends today" : (daysLeft <= 1 ? "The event ends tomorrow" : "Less than " + Math.ceil(daysLeft) + " days left in the event");
+        text += " ⏰ " + urgency + " — the rationale for hoarding hints (saving them for later, harder rounds) no longer applies: unused hints won't carry over. Spend your stock actively now instead of staying conservative.";
         if(level === "low") level = "medium";
         else if(level === "medium") level = "strong";
       }
     }
-    // tag 一律照最終等級重新對應，確保等級被升級後文字也一致
+    // Always re-derive the tag from the final level so text stays consistent after upgrades
     return {level: level, tag: HINT_LEVEL_META[level].tag, text: text};
   }
 
@@ -1036,14 +1041,14 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     if(candidates.length === 0){ box.innerHTML = ""; box.className = ""; return; }
     var adv = computeHintAdvice(ec, candidates, tuples);
     box.className = "advice-box lvl-" + adv.level;
-    var stock = (typeof state.remainingHints === "number") ? "　（目前庫存提示：" + state.remainingHints + "）" : "";
+    var stock = (typeof state.remainingHints === "number") ? " (hints in stock: " + state.remainingHints + ")" : "";
     var meta = HINT_LEVEL_META[adv.level];
     var scaleHtml = "";
     if(meta){
       var dots = "";
       for(var i=1;i<=3;i++){ dots += '<i class="' + (i<=meta.rank ? 'on' : '') + '"></i>'; }
-      scaleHtml = '<span class="meter" title="提示建議強度：共3級，越多實心點越建議現在使用">' + dots + '</span>' +
-        '<span class="strength-label">強度 ' + meta.rank + '/3・' + meta.strength + '</span>';
+      scaleHtml = '<span class="meter" title="Hint-usage strength: 3 levels; more filled dots = use a hint now">' + dots + '</span>' +
+        '<span class="strength-label">Strength ' + meta.rank + '/3 · ' + meta.strength + '</span>';
     }
     box.innerHTML = '<span class="tag">' + adv.tag + scaleHtml + '</span>' + adv.text + stock;
   }
@@ -1063,7 +1068,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     body.innerHTML = "";
 
     if(candidates.length === 0){
-      body.innerHTML = '<div class="hint" style="color:var(--bad);">目前沒有任何卡片符合所有條件，請檢查已知線索或猜測紀錄是否有輸入錯誤。</div>';
+      body.innerHTML = '<div class="hint" style="color:var(--bad);">No card matches all constraints. Check your clues or guess history for input mistakes.</div>';
       return;
     }
 
@@ -1071,8 +1076,8 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
       var names = findNamesForTuple(tuples[0].tuple, 8);
       var box = document.createElement("div");
       box.className = "answer-box";
-      box.innerHTML = '<div class="label">已鎖定答案組合</div><div class="names">' + names.join("、") + '</div>' +
-        (tuples[0].count>1 ? '<div class="hint">共 '+tuples[0].count+' 張卡符合，任一張皆算對（規則9）。</div>' : '');
+      box.innerHTML = '<div class="label">ANSWER LOCKED</div><div class="names">' + names.join(", ") + '</div>' +
+        (tuples[0].count>1 ? '<div class="hint">'+tuples[0].count+' cards match; guessing any of them counts (Rule 9).</div>' : '');
       body.appendChild(box);
       return;
     }
@@ -1080,7 +1085,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     var btn = document.createElement("button");
     btn.className = "primary";
     btn.style.width = "100%";
-    btn.textContent = "建議下一猜（計算最佳探測）";
+    btn.textContent = "Suggest next guess (compute best probe)";
     var out = document.createElement("div");
     out.style.marginTop = "10px";
     body.appendChild(btn);
@@ -1088,7 +1093,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
 
     btn.addEventListener("click", function(){
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> 計算中...';
+      btn.innerHTML = '<span class="spinner"></span> Computing...';
       setTimeout(function(){
         var allTuples = window.__ALL_TUPLES__;
         var top = computeEntropySuggestions(tuples, allTuples, Math.min(3, tuples.length));
@@ -1096,7 +1101,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
         var warn = document.createElement("div");
         warn.className = "hint";
         warn.style.color = "var(--bad)";
-        warn.innerHTML = "⚠ 建議卡是為了「最大化排除候選」挑的，<b>不代表它一定符合你已知的線索</b>（例如已知攻擊力2800，建議卡可能是2400）。點下方「用這張猜」會自動幫你把跟已知線索矛盾/相符的欄位先判斷好，你只要照遊戲實際顯示，把剩下沒被自動判斷的欄位補上對/錯就好。";
+        warn.innerHTML = "⚠ Suggested cards are chosen to eliminate the most candidates — <b>they may not match your known clues</b> (e.g. suggestion with ATK 2400 when you know the answer has 2800). \"Guess with this card\" auto-marks fields that agree/disagree with known clues; just fill in the rest per the in-game display.";
         out.appendChild(warn);
         top.forEach(function(r, idx){
           var names = findNamesForTuple(r.tuple, 3);
@@ -1106,14 +1111,14 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
           div.className = "suggest-card";
           div.innerHTML = '<span class="rank">'+(idx+1)+'</span><span class="sname">' + names.join(" / ") + '</span>' +
             '<div class="smeta" style="color:var(--text-dim);">' + filterMetaLine(r.tuple) + '</div>' +
-            '<div class="smeta">預估資訊量 ' + r.entropy.toFixed(2) + ' bits' + (r.isCandidate? '　·　本身也是候選答案':'') + '　·　最壞情況剩 ' + r.maxW + ' 張</div>' +
+            '<div class="smeta">Expected info ' + r.entropy.toFixed(2) + ' bits' + (r.isCandidate? ' · also a candidate':'') + ' · worst case: ' + r.maxW + ' left</div>' +
             '<div class="bar-bg"><div class="bar-fill" style="width:'+pct.toFixed(0)+'%"></div></div>';
           var pickBtn = document.createElement("button");
           pickBtn.type = "button";
           pickBtn.className = "gold";
           pickBtn.style.width = "100%";
           pickBtn.style.marginTop = "10px";
-          pickBtn.textContent = "用這張猜 →";
+          pickBtn.textContent = "Guess with this card →";
           pickBtn.addEventListener("click", function(){
             openAddGuessForm();
             selectCardForGuess(r.sample);
@@ -1124,9 +1129,9 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
         });
         var note = document.createElement("div");
         note.className = "hint";
-        note.textContent = "「資訊量」代表這一猜平均能排除多少候選；優先選資訊量高、且「最壞情況剩餘數」小的卡。若某筆本身也是候選答案，猜中機率額外加分。卡名下方那行數值可以直接拿去用遊戲內建的篩選功能鎖定卡片（遊戲沒有搜卡名的地方時特別好用）。";
+        note.textContent = "\"Expected info\" is how many candidates a guess eliminates on average — prefer high info with a small worst-case remainder. Guesses that are themselves candidates get bonus hit chance. The stat line under each name helps you locate the card with the in-game filter (handy where you can't search by name).";
         out.appendChild(note);
-        btn.textContent = "重新計算建議";
+        btn.textContent = "Recompute suggestions";
         btn.disabled = false;
       }, 30);
     });
@@ -1150,12 +1155,12 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     if(list.length > shown.length){
       var more = document.createElement("div");
       more.className = "cand-more";
-      more.textContent = "還有 " + (list.length - shown.length) + " 張未顯示，請用搜尋縮小範圍";
+      more.textContent = (list.length - shown.length) + " more not shown — refine your search";
       wrap.appendChild(more);
     }
     if(list.length === 0){
       var e = document.createElement("div");
-      e.className = "cand-more"; e.textContent = "無符合卡片";
+      e.className = "cand-more"; e.textContent = "No matching cards";
       wrap.appendChild(e);
     }
   }
@@ -1262,39 +1267,37 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     setupSearch();
   }
 
-  // 問題回饋：只帶「工具狀態」（已知線索/猜測紀錄/候選數等），不含任何個資，
-  // 組成純文字後塞進 Google 表單的「預先填寫連結」，開新分頁讓使用者自己按送出。
-  var FEEDBACK_FORM_BASE = "https://docs.google.com/forms/d/e/1FAIpQLSdtjrgb7oDmdQ58z7NQoCeMW-gzBEMemG1jYdB11-p6iTzWwA/viewform";
-  var FEEDBACK_ENTRY_DESC = "entry.1899388008";
-  var FEEDBACK_ENTRY_STATE = "entry.1624951211";
+  // Feedback: only the tool state (known clues / guess history / candidate counts),
+  // no personal info, is composed into a prefilled GitHub issue on this fork.
+  var FEEDBACK_FORM_BASE = "https://github.com/hprabowo076/yugioh-md-decoder/issues/new";
 
   function buildToolStateSummary(){
     var ec = effectiveConstraints();
     var lines = [];
-    lines.push("工具版本：" + TOOL_VERSION);
-    lines.push("回合：第 " + state.round + " 題");
+    lines.push("Tool version: " + TOOL_VERSION);
+    lines.push("Round: question " + state.round);
     var knownParts = FIELDS.map(function(f){
       return ec.known[f] !== undefined ? (FIELD_NAMES[f] + "=" + ec.known[f]) : null;
     }).filter(Boolean);
-    lines.push("已知線索：" + (knownParts.length ? knownParts.join("、") : "（無）"));
+    lines.push("Known clues: " + (knownParts.length ? knownParts.join(", ") : "(none)"));
     if(state.guesses.length){
-      lines.push("猜測紀錄（" + state.guesses.length + " 次）：");
+      lines.push("Guess history (" + state.guesses.length + " guesses):");
       state.guesses.forEach(function(g, idx){
         var fb = FIELDS.map(function(f){
           var m = g.matches[f];
           return FIELD_NAMES[f] + (m === true ? "✓" : (m === false ? "✗" : "?"));
         }).join(" ");
         var idPart = g.id ? ("#" + g.id + " ") : "";
-        lines.push("  " + (idx+1) + ". " + idPart + g.name + "｜" + fb);
+        lines.push("  " + (idx+1) + ". " + idPart + g.name + " | " + fb);
       });
     } else {
-      lines.push("猜測紀錄：（無）");
+      lines.push("Guess history: (none)");
     }
     var candidates = computeCandidates();
     var tuples = dedupeByTuple(candidates);
-    lines.push("符合卡片數：" + candidates.length + "，唯一組合數：" + tuples.length);
-    if(typeof state.remainingGuesses === "number") lines.push("剩餘猜測次數：" + state.remainingGuesses);
-    if(typeof state.remainingHints === "number") lines.push("剩餘提示次數：" + state.remainingHints);
+    lines.push("Matching cards: " + candidates.length + ", unique combos: " + tuples.length);
+    if(typeof state.remainingGuesses === "number") lines.push("Remaining guesses: " + state.remainingGuesses);
+    if(typeof state.remainingHints === "number") lines.push("Remaining hints: " + state.remainingHints);
     return lines.join("\n");
   }
 
@@ -1303,16 +1306,15 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     var text = document.getElementById("feedbackText").value.trim();
     if(!text){
       msg.style.color = "var(--bad)";
-      msg.textContent = "請先描述一下遇到的問題，再送出。";
+      msg.textContent = "Please describe the problem before sending.";
       return;
     }
     var stateSummary = buildToolStateSummary();
-    var url = FEEDBACK_FORM_BASE + "?usp=pp_url" +
-      "&" + FEEDBACK_ENTRY_DESC + "=" + encodeURIComponent(text) +
-      "&" + FEEDBACK_ENTRY_STATE + "=" + encodeURIComponent(stateSummary);
+    var url = FEEDBACK_FORM_BASE + "?title=" + encodeURIComponent("Feedback") +
+      "&body=" + encodeURIComponent(text + "\n\n---\n" + stateSummary);
     window.open(url, "_blank", "noopener");
     msg.style.color = "var(--good)";
-    msg.textContent = "已經幫你把描述跟目前的工具狀態填好，開新分頁後按 Google 表單的「提交」就完成了。";
+    msg.textContent = "Your description and the current tool state were prefilled — just hit submit on the GitHub issue in the new tab.";
   }
 
   function init(){
@@ -1320,7 +1322,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     setupFontControl();
     loadState();
     var vt = document.getElementById("versionTag");
-    if(vt) vt.textContent = "・版本 " + TOOL_VERSION;
+    if(vt) vt.textContent = "· version " + TOOL_VERSION;
     fetch("cards.json").then(function(r){ return r.json(); }).then(function(data){
       data.forEach(function(c){ c.isPendulum = isPendulumCard(c.type); c.type = normalizeGameType(c.type); });
       CARDS = data;
@@ -1331,7 +1333,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
       setupEvents();
       renderAll();
     }).catch(function(err){
-      document.getElementById("knownRows").innerHTML = '<div class="hint" style="color:var(--bad);">卡片資料載入失敗，請重新整理頁面。</div>';
+      document.getElementById("knownRows").innerHTML = '<div class="hint" style="color:var(--bad);">Failed to load card data. Please reload the page.</div>';
     });
   }
 
