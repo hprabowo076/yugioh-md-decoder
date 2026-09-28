@@ -289,8 +289,9 @@ textarea:focus{ outline:2px solid var(--arcane); outline-offset:1px; }
 
 .hint{ font-size:0.8rem; color:var(--text-faint); line-height:1.5; margin-top:8px; }
 
+.pendulum-toggles{ display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
 .pendulum-toggle{
-  display:flex; gap:10px; align-items:flex-start; cursor:pointer; margin-bottom:12px;
+  display:flex; gap:10px; align-items:flex-start; cursor:pointer; margin-bottom:0;
   padding:10px 12px; border-radius:10px; border:1.5px dashed var(--border);
   font-size:0.78rem; color:var(--text-dim); line-height:1.5;
 }
@@ -443,10 +444,16 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
 <div class="panel">
   <div class="panel-title"><h2><span class="n">4</span>候選結果</h2></div>
   <div id="hintAdvice"></div>
-  <label class="pendulum-toggle" for="excludePendulumChk">
-    <input type="checkbox" id="excludePendulumChk">
-    <span>排除項目-鐘擺（符合卡片數與遊戲中不同時，請檢查遊戲中篩選功能是否自動勾選了排除鐘擺怪獸——這其實是遊戲Bug，不是穩定規則。如果你在遊戲裡看到它被自動勾起，代表這題答案確定不是鐘擺卡，這裡也勾起來同步排除）</span>
-  </label>
+  <div class="pendulum-toggles">
+    <label class="pendulum-toggle" for="excludePendulumChk">
+      <input type="checkbox" id="excludePendulumChk">
+      <span>排除項目-鐘擺（符合卡片數與遊戲中不同時，請檢查遊戲中篩選功能是否自動勾選了排除鐘擺怪獸——這其實是遊戲Bug，不是穩定規則。如果你在遊戲裡看到它被自動勾起，代表這題答案確定不是鐘擺卡，這裡也勾起來同步排除）</span>
+    </label>
+    <label class="pendulum-toggle" for="requirePendulumChk">
+      <input type="checkbox" id="requirePendulumChk">
+      <span>必為鐘擺卡（當遊戲內自動篩選勾起靈擺卡時可以勾選，理由同上——這代表遊戲判斷答案確定是鐘擺卡，這裡也勾起來讓候選卡只留下鐘擺卡）</span>
+    </label>
+  </div>
   <div class="stat-row">
     <div class="stat"><div class="num tabular" id="statCount">-</div><div class="lbl">符合卡片數</div></div>
     <div class="stat"><div class="num tabular" id="statTuple">-</div><div class="lbl">唯一組合數</div></div>
@@ -557,12 +564,13 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     guesses: [], // {id,name,card:{...}, matches:{type,attr,race,lv,atk,def}}
     remainingGuesses: null,
     remainingHints: null,
-    excludePendulum: false
+    excludePendulum: false,
+    requirePendulum: false
   };
 
   // 每次發布時手動更新這個時間戳（台灣時間），問題回饋會自動帶上這個版本，
   // 方便回報時判斷對方是不是還沒更新到已修好的版本。
-  var TOOL_VERSION = "2026-09-27 06:35";
+  var TOOL_VERSION = "2026-09-29 09:15";
 
   var CARDS = [];
   var byId = {};
@@ -584,6 +592,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
           state.remainingGuesses = (typeof parsed.remainingGuesses === "number") ? parsed.remainingGuesses : null;
           state.remainingHints = (typeof parsed.remainingHints === "number") ? parsed.remainingHints : null;
           state.excludePendulum = !!parsed.excludePendulum;
+          state.requirePendulum = !!parsed.requirePendulum;
         }
       }
     }catch(e){}
@@ -738,7 +747,8 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
   function computeCandidates(){
     var ec = effectiveConstraints();
     return CARDS.filter(function(c){
-      if(state.excludePendulum && c.isPendulum) return false; // 使用者手動勾選「排除靈擺」時才排除
+      if(state.excludePendulum && c.isPendulum) return false; // 使用者手動勾選「排除鐘擺」時才排除
+      if(state.requirePendulum && !c.isPendulum) return false; // 使用者手動勾選「必為鐘擺」時，只留下靈擺卡
       if(EXCLUDED_ANSWER_IDS[c.id]) return false;
       for(var i=0;i<FIELDS.length;i++){
         var f = FIELDS[i];
@@ -1197,6 +1207,8 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     renderRoundLabel();
     var pendChk = document.getElementById("excludePendulumChk");
     if(pendChk) pendChk.checked = !!state.excludePendulum;
+    var reqPendChk = document.getElementById("requirePendulumChk");
+    if(reqPendChk) reqPendChk.checked = !!state.requirePendulum;
   }
 
   function recompute(){
@@ -1277,6 +1289,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
       state.known = {type:null,attr:null,race:null,lv:null,atk:null,def:null};
       state.guesses = [];
       state.excludePendulum = false;
+      state.requirePendulum = false;
       saveState();
       renderAll();
     });
@@ -1286,8 +1299,15 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     document.getElementById("sendFeedbackBtn").addEventListener("click", sendFeedback);
     document.getElementById("excludePendulumChk").addEventListener("change", function(){
       state.excludePendulum = this.checked;
+      if(state.excludePendulum) state.requirePendulum = false; // 兩個勾互斥
       saveState();
-      recompute();
+      renderAll();
+    });
+    document.getElementById("requirePendulumChk").addEventListener("change", function(){
+      state.requirePendulum = this.checked;
+      if(state.requirePendulum) state.excludePendulum = false; // 兩個勾互斥
+      saveState();
+      renderAll();
     });
     setupSearch();
   }
@@ -1303,6 +1323,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     var lines = [];
     lines.push("工具版本：" + TOOL_VERSION);
     lines.push("已手動排除靈擺：" + (state.excludePendulum ? "是" : "否"));
+    lines.push("已手動標記必為靈擺：" + (state.requirePendulum ? "是" : "否"));
     lines.push("回合：第 " + state.round + " 題");
     var knownParts = FIELDS.map(function(f){
       return ec.known[f] !== undefined ? (FIELD_NAMES[f] + "=" + ec.known[f]) : null;
