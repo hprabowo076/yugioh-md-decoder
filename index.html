@@ -289,8 +289,9 @@ textarea:focus{ outline:2px solid var(--arcane); outline-offset:1px; }
 
 .hint{ font-size:0.8rem; color:var(--text-faint); line-height:1.5; margin-top:8px; }
 
+.pendulum-toggles{ display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
 .pendulum-toggle{
-  display:flex; gap:10px; align-items:flex-start; cursor:pointer; margin-bottom:12px;
+  display:flex; gap:10px; align-items:flex-start; cursor:pointer; margin-bottom:0;
   padding:10px 12px; border-radius:10px; border:1.5px dashed var(--border);
   font-size:0.78rem; color:var(--text-dim); line-height:1.5;
 }
@@ -443,10 +444,16 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
 <div class="panel">
   <div class="panel-title"><h2><span class="n">4</span>Results</h2></div>
   <div id="hintAdvice"></div>
-  <label class="pendulum-toggle" for="excludePendulumChk">
-    <input type="checkbox" id="excludePendulumChk">
-    <span>Exclude — Pendulum (when the matching-card count differs from the game's, check whether the in-game filter auto-checked "exclude Pendulum monsters" — that's a game bug, not a stable rule. If you see it ticked automatically in the game, this round's answer is definitely not a Pendulum card, so tick it here too to exclude them in sync)</span>
-  </label>
+  <div class="pendulum-toggles">
+    <label class="pendulum-toggle" for="excludePendulumChk">
+      <input type="checkbox" id="excludePendulumChk">
+      <span>Exclude — Pendulum (when the matching-card count differs from the game's, check whether the in-game filter auto-checked "exclude Pendulum monsters" — that's a game bug, not a stable rule. If you see it ticked automatically in the game, this round's answer is definitely not a Pendulum card, so tick it here too to exclude them in sync)</span>
+    </label>
+    <label class="pendulum-toggle" for="requirePendulumChk">
+      <input type="checkbox" id="requirePendulumChk">
+      <span>Require — Pendulum (tick this when the in-game auto-filter picks Pendulum cards; same reasoning as above — it means the game is certain the answer is a Pendulum card, so tick it here to narrow the candidates down to Pendulum cards only)</span>
+    </label>
+  </div>
   <div class="stat-row">
     <div class="stat"><div class="num tabular" id="statCount">-</div><div class="lbl">Matching cards</div></div>
     <div class="stat"><div class="num tabular" id="statTuple">-</div><div class="lbl">Unique combos</div></div>
@@ -560,7 +567,8 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     guesses: [], // {id,name,card:{...}, matches:{type,attr,race,lv,atk,def}}
     remainingGuesses: null,
     remainingHints: null,
-    excludePendulum: false
+    excludePendulum: false,
+    requirePendulum: false
   };
 
   // Manually updated on each release (UTC+8). Included automatically in feedback
@@ -587,6 +595,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
           state.remainingGuesses = (typeof parsed.remainingGuesses === "number") ? parsed.remainingGuesses : null;
           state.remainingHints = (typeof parsed.remainingHints === "number") ? parsed.remainingHints : null;
           state.excludePendulum = !!parsed.excludePendulum;
+          state.requirePendulum = !!parsed.requirePendulum;
         }
       }
     }catch(e){}
@@ -743,6 +752,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     var ec = effectiveConstraints();
     return CARDS.filter(function(c){
       if(state.excludePendulum && c.isPendulum) return false; // only excluded when the user ticks the box
+      if(state.requirePendulum && !c.isPendulum) return false; // only Pendulum cards left when the user ticks this
       if(EXCLUDED_ANSWER_IDS[c.id]) return false;
       for(var i=0;i<FIELDS.length;i++){
         var f = FIELDS[i];
@@ -1204,6 +1214,8 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     renderRoundLabel();
     var pendChk = document.getElementById("excludePendulumChk");
     if(pendChk) pendChk.checked = !!state.excludePendulum;
+    var reqPendChk = document.getElementById("requirePendulumChk");
+    if(reqPendChk) reqPendChk.checked = !!state.requirePendulum;
   }
 
   function recompute(){
@@ -1284,6 +1296,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
       state.known = {type:null,attr:null,race:null,lv:null,atk:null,def:null};
       state.guesses = [];
       state.excludePendulum = false;
+      state.requirePendulum = false;
       saveState();
       renderAll();
     });
@@ -1293,8 +1306,15 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     document.getElementById("sendFeedbackBtn").addEventListener("click", sendFeedback);
     document.getElementById("excludePendulumChk").addEventListener("change", function(){
       state.excludePendulum = this.checked;
+      if(state.excludePendulum) state.requirePendulum = false; // the two checkboxes are mutually exclusive
       saveState();
-      recompute();
+      renderAll();
+    });
+    document.getElementById("requirePendulumChk").addEventListener("change", function(){
+      state.requirePendulum = this.checked;
+      if(state.requirePendulum) state.excludePendulum = false; // the two checkboxes are mutually exclusive
+      saveState();
+      renderAll();
     });
     setupSearch();
   }
@@ -1308,6 +1328,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
     var lines = [];
     lines.push("Tool version: " + TOOL_VERSION);
     lines.push("Manually excluded Pendulum: " + (state.excludePendulum ? "yes" : "no"));
+    lines.push("Manually required Pendulum: " + (state.requirePendulum ? "yes" : "no"));
     lines.push("Round: question " + state.round);
     var knownParts = FIELDS.map(function(f){
       return ec.known[f] !== undefined ? (FIELD_NAMES[f] + "=" + ec.known[f]) : null;
