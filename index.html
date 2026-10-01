@@ -25,14 +25,16 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
+    /* V6 + 最外層改紫色：最底層 body 背景（--bg + 下面的 accent-glow）用原版紫色，
+       面板（--surface/--surface2/--border）維持方案3的中性深灰階。 */
     --bg:#0d0c17;
-    --surface:#161428;
-    --surface2:#1e1b38;
-    --border:#33305c;
-    --border-soft:#2a274a;
-    --text:#ece8fb;
-    --text-dim:#a49bd6;
-    --text-faint:#726a9c;
+    --surface:#1c1c1c;
+    --surface2:#242424;
+    --border:#3a3a3a;
+    --border-soft:#2e2e2e;
+    --text:rgba(255,255,255,1);
+    --text-dim:rgba(255,255,255,0.72);
+    --text-faint:rgba(255,255,255,0.60);
     --gold:#e0b64f;
     --gold-shine:#f5dfa0;
     --gold-dim:#8a742f;
@@ -41,20 +43,28 @@
     --bad:#ff6d7a;
     --unknown:#4a4670;
     --accent-glow: rgba(139,107,255,0.16);
-    --shadow-inset: rgba(255,255,255,0.03);
+    --shadow-inset: rgba(255,255,255,0.04);
     --shadow-outer: rgba(0,0,0,0.6);
+    /* .ghost 按鈕（開始新的一回合、+/−、取消）在深色面板上原本只靠 1px 邊框，
+       邊框色跟面板幾乎同色，看起來像「沒有按鈕」。這裡疊一層白色半透明當底色，
+       邊框也加亮到跟面板的對比度 ≥3:1（WCAG 非文字元件最低標準），確保看得出是按鈕。 */
+    --ghost-bg: rgba(255,255,255,0.08);
+    --ghost-bg-hover: rgba(255,255,255,0.14);
+    --ghost-border: rgba(255,255,255,0.4);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"]{
+  /* V6 + 最外層改紫色：最底層 body 背景（--bg + 下面的 accent-glow）用原版紫色，
+     面板（--surface/--surface2/--border）維持方案3的中性深灰階。 */
   --bg:#0d0c17;
-  --surface:#161428;
-  --surface2:#1e1b38;
-  --border:#33305c;
-  --border-soft:#2a274a;
-  --text:#ece8fb;
-  --text-dim:#a49bd6;
-  --text-faint:#726a9c;
+  --surface:#1c1c1c;
+  --surface2:#242424;
+  --border:#3a3a3a;
+  --border-soft:#2e2e2e;
+  --text:rgba(255,255,255,1);
+  --text-dim:rgba(255,255,255,0.72);
+  --text-faint:rgba(255,255,255,0.60);
   --gold:#e0b64f;
   --gold-shine:#f5dfa0;
   --gold-dim:#8a742f;
@@ -63,8 +73,11 @@
   --bad:#ff6d7a;
   --unknown:#4a4670;
   --accent-glow: rgba(139,107,255,0.16);
-  --shadow-inset: rgba(255,255,255,0.03);
+  --shadow-inset: rgba(255,255,255,0.04);
   --shadow-outer: rgba(0,0,0,0.6);
+  --ghost-bg: rgba(255,255,255,0.08);
+  --ghost-bg-hover: rgba(255,255,255,0.14);
+  --ghost-border: rgba(255,255,255,0.4);
   color-scheme: dark;
 }
 *{box-sizing:border-box;}
@@ -169,21 +182,27 @@ select:focus{ outline:2px solid var(--arcane); outline-offset:1px; }
 .chip b{color:var(--gold); font-weight:600;}
 .chip.empty{ color:var(--text-faint); border-style:dashed; background:transparent; }
 
+/* 按鈕分級：filled（.primary / .gold）=這一步主要該做的事，一律 font-weight:700、
+   同樣的漸層寫法跟陰影，只差強調色（紫=一般動作，金=會消耗「提示」這個稀缺資源，
+   顏色不同是刻意的語意區分，不是配色不統一）；.ghost = 次要/重置/取消動作，統一用
+   同一條 border 線框、font-weight:600，份量比 filled 按鈕輕一階，但彼此之間一致。 */
 button{
   font-family:inherit; cursor:pointer; border-radius:9px; border:1px solid var(--border);
   background:var(--surface); color:var(--text); padding:9px 14px; font-size:0.85rem;
+  font-weight:600;
   transition: transform 0.1s ease, border-color 0.15s ease;
 }
 button:active{ transform: scale(0.97); }
 button.primary{
   background: linear-gradient(135deg, #6a4de0, var(--arcane));
-  border-color: transparent; color:#fff; font-weight:600;
+  border-color: transparent; color:#fff; font-weight:700;
 }
 button.gold{
   background: linear-gradient(135deg, #8a742f, var(--gold));
   border-color: transparent; color:#241d05; font-weight:700;
 }
-button.ghost{ background:transparent; color:var(--text-dim); }
+button.ghost{ background:var(--ghost-bg,transparent); border-color:var(--ghost-border,var(--border)); color:var(--text-dim); font-weight:600; }
+button.ghost:hover{ background:var(--ghost-bg-hover,var(--surface2)); }
 button:disabled{ opacity:0.4; cursor:not-allowed; }
 .btnrow{ display:flex; gap:8px; flex-wrap:wrap; }
 
@@ -570,7 +589,7 @@ footer{ text-align:center; color:var(--text-faint); font-size:0.76rem; margin-to
 
   // 每次發布時手動更新這個時間戳（台灣時間），問題回饋會自動帶上這個版本，
   // 方便回報時判斷對方是不是還沒更新到已修好的版本。
-  var TOOL_VERSION = "2026-09-29 09:15";
+  var TOOL_VERSION = "2026-10-01 10:40";
 
   var CARDS = [];
   var byId = {};
