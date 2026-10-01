@@ -25,14 +25,17 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
+    /* V6 + outermost stays purple: the body background (--bg plus the accent-glow
+       below) keeps the original purple tone, while panels (--surface/--surface2/
+       --border) use the neutral dark greys of option 3. */
     --bg:#0d0c17;
-    --surface:#161428;
-    --surface2:#1e1b38;
-    --border:#33305c;
-    --border-soft:#2a274a;
-    --text:#ece8fb;
-    --text-dim:#a49bd6;
-    --text-faint:#726a9c;
+    --surface:#1c1c1c;
+    --surface2:#242424;
+    --border:#3a3a3a;
+    --border-soft:#2e2e2e;
+    --text:rgba(255,255,255,1);
+    --text-dim:rgba(255,255,255,0.72);
+    --text-faint:rgba(255,255,255,0.60);
     --gold:#e0b64f;
     --gold-shine:#f5dfa0;
     --gold-dim:#8a742f;
@@ -41,20 +44,30 @@
     --bad:#ff6d7a;
     --unknown:#4a4670;
     --accent-glow: rgba(139,107,255,0.16);
-    --shadow-inset: rgba(255,255,255,0.03);
+    --shadow-inset: rgba(255,255,255,0.04);
     --shadow-outer: rgba(0,0,0,0.6);
+    /* The .ghost buttons (start new round, +/−, cancel) relied on a 1px border that
+       was nearly the same colour as the panel, so they read as "no button at all".
+       Layer a translucent white background on top and brighten the border to ≥3:1
+       contrast against the panel (WCAG minimum for non-text elements). */
+    --ghost-bg: rgba(255,255,255,0.08);
+    --ghost-bg-hover: rgba(255,255,255,0.14);
+    --ghost-border: rgba(255,255,255,0.4);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"]{
+  /* V6 + outermost stays purple: the body background (--bg plus the accent-glow
+     below) keeps the original purple tone, while panels (--surface/--surface2/
+     --border) use the neutral dark greys of option 3. */
   --bg:#0d0c17;
-  --surface:#161428;
-  --surface2:#1e1b38;
-  --border:#33305c;
-  --border-soft:#2a274a;
-  --text:#ece8fb;
-  --text-dim:#a49bd6;
-  --text-faint:#726a9c;
+  --surface:#1c1c1c;
+  --surface2:#242424;
+  --border:#3a3a3a;
+  --border-soft:#2e2e2e;
+  --text:rgba(255,255,255,1);
+  --text-dim:rgba(255,255,255,0.72);
+  --text-faint:rgba(255,255,255,0.60);
   --gold:#e0b64f;
   --gold-shine:#f5dfa0;
   --gold-dim:#8a742f;
@@ -63,8 +76,11 @@
   --bad:#ff6d7a;
   --unknown:#4a4670;
   --accent-glow: rgba(139,107,255,0.16);
-  --shadow-inset: rgba(255,255,255,0.03);
+  --shadow-inset: rgba(255,255,255,0.04);
   --shadow-outer: rgba(0,0,0,0.6);
+  --ghost-bg: rgba(255,255,255,0.08);
+  --ghost-bg-hover: rgba(255,255,255,0.14);
+  --ghost-border: rgba(255,255,255,0.4);
   color-scheme: dark;
 }
 *{box-sizing:border-box;}
@@ -169,21 +185,29 @@ select:focus{ outline:2px solid var(--arcane); outline-offset:1px; }
 .chip b{color:var(--gold); font-weight:600;}
 .chip.empty{ color:var(--text-faint); border-style:dashed; background:transparent; }
 
+/* Button tiers: filled (.primary / .gold) = the main action of a step, always
+   font-weight:700 with the same gradient and shadow treatment, differing only in the
+   accent colour (purple = normal action, gold = spends the scarce "hint" resource;
+   the colour split is a deliberate semantic distinction, not an inconsistency).
+   .ghost = secondary/reset/cancel actions, uniformly a single border outline at
+   font-weight:600 — one step lighter than filled, but consistent among themselves. */
 button{
   font-family:inherit; cursor:pointer; border-radius:9px; border:1px solid var(--border);
   background:var(--surface); color:var(--text); padding:9px 14px; font-size:0.85rem;
+  font-weight:600;
   transition: transform 0.1s ease, border-color 0.15s ease;
 }
 button:active{ transform: scale(0.97); }
 button.primary{
   background: linear-gradient(135deg, #6a4de0, var(--arcane));
-  border-color: transparent; color:#fff; font-weight:600;
+  border-color: transparent; color:#fff; font-weight:700;
 }
 button.gold{
   background: linear-gradient(135deg, #8a742f, var(--gold));
   border-color: transparent; color:#241d05; font-weight:700;
 }
-button.ghost{ background:transparent; color:var(--text-dim); }
+button.ghost{ background:var(--ghost-bg,transparent); border-color:var(--ghost-border,var(--border)); color:var(--text-dim); font-weight:600; }
+button.ghost:hover{ background:var(--ghost-bg-hover,var(--surface2)); }
 button:disabled{ opacity:0.4; cursor:not-allowed; }
 .btnrow{ display:flex; gap:8px; flex-wrap:wrap; }
 
